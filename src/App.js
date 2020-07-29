@@ -419,6 +419,8 @@ function App() {
     );
   }
 
+  const [selectedMonth, setSelectedMonth] = React.useState(moment().month());
+
   function onBonoChange(id, key, value) {
     const index = _.findIndex(bonos, (bono) => bono.id === id);
     setBonos(
@@ -455,7 +457,11 @@ function App() {
           </TabList>
 
           <TabPanel>
-            <h1>Horas</h1>
+            <p>
+              Necesitaras una <b>Hora</b> por cada tipo de trabajo que realices
+              si los trabajos tienen distintas remuneraciones por hora.
+            </p>
+            <hr></hr>
             {_.map(horas, (hora, i) => (
               <Hora
                 key={i}
@@ -488,7 +494,13 @@ function App() {
             </button>
           </TabPanel>
           <TabPanel>
-            <h1>Guardias</h1>
+            <p>
+              Una <b>Guardia</b> es una jornada laboral. Cada jornada se asocia
+              con una <b>Hora</b> para obtener el valor base de cada hora
+              trabajada. Luego puedes utilizar los <b>Bono</b>s para realizar
+              ajustes.
+            </p>
+            <hr></hr>
             {_.map(guardias, (guardia, i) => (
               <Guardia
                 key={i}
@@ -512,7 +524,11 @@ function App() {
             </button>
           </TabPanel>
           <TabPanel>
-            <h1>Bonos</h1>
+            <p>
+              Los <b>Bono</b>s permiten ajustar el retorno de una hora de
+              trabajo segun varios parametros.
+            </p>
+            <hr></hr>
             {_.map(bonos, (bono, i) => (
               <Bono
                 key={i}
@@ -532,8 +548,18 @@ function App() {
             </button>
           </TabPanel>
           <TabPanel>
-            <h1>Sueldo</h1>
-            <h1>$ {monthEarnings(moment().month(), guardias, horas, bonos)}</h1>
+            <p>Selecciona el mes y ve el resultado debajo.</p>
+            <hr></hr>
+            <input
+              type="month"
+              value={moment()
+                .month(selectedMonth)
+                .format(moment.HTML5_FMT.MONTH)}
+              onChange={(event) => {
+                setSelectedMonth(moment(event.target.value).month());
+              }}
+            ></input>
+            <h1>$ {monthEarnings(selectedMonth, guardias, horas, bonos)}</h1>
           </TabPanel>
         </Tabs>
       </main>
