@@ -1,49 +1,62 @@
-.App {
-  padding: 16px;
-  max-width: 1024px;
-  margin: auto;
+:root {
+  --primary-color: 146, 102, 204;
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: rgba(var(--primary-color));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 1vmin);
   color: white;
 }
 
-.Hora {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  padding: 6px;
-  margin-bottom: 6px;
-  border: 1px solid #282c345e;
+.App-main {
+  padding: 16px 16px 0 16px;
+  max-width: 1024px;
+  margin: auto;
 }
 
-.Guardia {
+.Field {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  padding: 6px;
-  margin-bottom: 6px;
-  border: 1px solid #282c345e;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 6px 0 6px;
+  margin: 6px;
+  flex-grow: 1;
+  border: 1px hsla(0, 0%, 0%, 0.05) solid;
+  border-radius: 5px;
+  /* box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.2); */
 }
 
+.RadioGroupItem {
+  display: flex;
+  justify-content: space-between;
+}
+
+.FieldList {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+}
+
+.Hora,
+.Guardia,
 .Bono {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
-  padding: 6px;
-  margin-bottom: 6px;
-  border: 1px solid #282c345e;
+  align-items: center;
+  margin-bottom: 4px;
+  box-shadow: 0 1px 3px hsla(0, 0%, 0%, 0.2);
+  padding-right: 6px;
 }
 
 .Sueldo {
-  margin-top: 16px;
-  padding: 16px;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
   text-align: center;
-  background-color: #282c342d;
+  background-color: rgba(var(--primary-color), 0.2);
 }

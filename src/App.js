@@ -1,11 +1,12 @@
 import React from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 import produce from "immer";
 import _ from "lodash";
 import cx from "classnames";
 import moment from "moment";
 import "./App.css";
 import { useLocalStorageState } from "./utils";
-
 import { monthEarnings } from "./core";
 
 const feriados = [
@@ -44,7 +45,7 @@ function Field(props) {
   const inputId = React.useRef(_.uniqueId());
   if (type === "select") {
     return (
-      <div className="form-group row mb-2">
+      <div className="Field">
         <label
           id={labelId.current}
           htmlFor={inputId.current}
@@ -52,34 +53,32 @@ function Field(props) {
         >
           {label}
         </label>
-        <div className="col-sm-10">
-          <select
-            id={inputId.current}
-            readOnly={!editable}
-            className={cx({
-              "form-control": editable,
-              "form-control-plaintext": !editable,
-            })}
-            aria-labelledby={labelId.current}
-            value={value}
-            onChange={onChange}
-          >
-            {_.map(props[optionsProp], (optionData) => (
-              <option value={optionData.id} key={optionData.id}>
-                {optionData.fields.name.value}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          id={inputId.current}
+          readOnly={!editable}
+          className={cx({
+            "form-control": editable,
+            "form-control-plaintext": !editable,
+          })}
+          aria-labelledby={labelId.current}
+          value={value}
+          onChange={onChange}
+        >
+          {_.map(props[optionsProp], (optionData) => (
+            <option value={optionData.id} key={optionData.id}>
+              {optionData.fields.name.value}
+            </option>
+          ))}
+        </select>
       </div>
     );
   }
 
   if (type === "radioGroup") {
     return (
-      <div>
+      <div className="Field">
         {_.map(options, (option, i) => (
-          <div key={i}>
+          <div className="RadioGroupItem" key={i}>
             <label
               id={labelId.current}
               htmlFor={inputId.current}
@@ -103,7 +102,7 @@ function Field(props) {
   }
 
   return (
-    <div className="form-group row mb-2">
+    <div className="Field">
       <label
         id={labelId.current}
         htmlFor={inputId.current}
@@ -111,21 +110,19 @@ function Field(props) {
       >
         {label}
       </label>
-      <div className="col-sm-10">
-        <input
-          type={type}
-          id={inputId.current}
-          readOnly={!editable}
-          className={cx({
-            "form-control": editable,
-            "form-control-plaintext": !editable,
-          })}
-          aria-labelledby={labelId.current}
-          value={value}
-          onChange={onChange}
-          {...numberProps}
-        />
-      </div>
+      <input
+        type={type}
+        id={inputId.current}
+        readOnly={!editable}
+        className={cx({
+          "form-control": editable,
+          "form-control-plaintext": !editable,
+        })}
+        aria-labelledby={labelId.current}
+        value={value}
+        onChange={onChange}
+        {...numberProps}
+      />
     </div>
   );
 }
@@ -133,14 +130,16 @@ function Field(props) {
 function Hora({ data, onChange, onDelete }) {
   return (
     <div className="Hora">
-      {_.map(data.fields, (field, key) => (
-        <Field
-          key={key}
-          {...field}
-          onChange={(event) => onChange(key, event.target.value)}
-          editable
-        />
-      ))}
+      <div className="FieldList">
+        {_.map(data.fields, (field, key) => (
+          <Field
+            key={key}
+            {...field}
+            onChange={(event) => onChange(key, event.target.value)}
+            editable
+          />
+        ))}
+      </div>
       <button disabled={!onDelete} onClick={onDelete}>
         Eliminar
       </button>
@@ -151,15 +150,17 @@ function Hora({ data, onChange, onDelete }) {
 function Guardia({ data, horas, onChange, onDelete }) {
   return (
     <div className="Guardia">
-      {_.map(data.fields, (field, key) => (
-        <Field
-          key={key}
-          {...field}
-          onChange={(event) => onChange(key, event.target.value)}
-          editable={onChange}
-          horas={horas}
-        />
-      ))}
+      <div className="FieldList">
+        {_.map(data.fields, (field, key) => (
+          <Field
+            key={key}
+            {...field}
+            onChange={(event) => onChange(key, event.target.value)}
+            editable={onChange}
+            horas={horas}
+          />
+        ))}
+      </div>
       <button disabled={!onDelete} onClick={onDelete}>
         Eliminar
       </button>
@@ -170,17 +171,19 @@ function Guardia({ data, horas, onChange, onDelete }) {
 function Bono({ data, onChange, onDelete }) {
   return (
     <div className="Bono">
-      {_.map(
-        _.pickBy(data.fields, (f) => _.isUndefined(f.visible) || f.visible),
-        (field, key) => (
-          <Field
-            key={key}
-            {...field}
-            onChange={(event) => onChange(key, event.target.value)}
-            editable={onChange}
-          />
-        )
-      )}
+      <div className="FieldList">
+        {_.map(
+          _.pickBy(data.fields, (f) => _.isUndefined(f.visible) || f.visible),
+          (field, key) => (
+            <Field
+              key={key}
+              {...field}
+              onChange={(event) => onChange(key, event.target.value)}
+              editable={onChange}
+            />
+          )
+        )}
+      </div>
       <button onClick={onDelete}>Eliminar</button>
     </div>
   );
@@ -442,80 +445,97 @@ function App() {
       <header className="App-header">
         <h1>Calcuguardias</h1>
       </header>
-      <main>
-        <section>
-          <h1>Horas</h1>
-          {_.map(horas, (hora, i) => (
-            <Hora
-              key={i}
-              data={hora}
-              onChange={(key, value) => onHoraChange(hora.id, key, value)}
-              onDelete={
-                _.size(horas) > 1
-                  ? () => {
-                      setHoras(
-                        produce((horas) => {
-                          _.remove(horas, (h) => h.id === hora.id);
-                        })
-                      );
-                      setGuardias(
-                        produce((guardias) => {
-                          _.forEach(guardias, (guardia) => {
-                            if (guardia.fields.hour.value === hora.id) {
-                              guardia.fields.hour.value = horas[0].id;
-                            }
-                          });
-                        })
-                      );
-                    }
-                  : undefined
-              }
-            />
-          ))}
-          <button onClick={onAgregarHoraClick}>Agregar Hora</button>
-        </section>
-        <section>
-          <h1>Guardias</h1>
-          {_.map(guardias, (guardia, i) => (
-            <Guardia
-              key={i}
-              data={guardia}
-              horas={horas}
-              onChange={(key, value) => onGuardiaChange(guardia.id, key, value)}
-              onDelete={() =>
-                setGuardias(
-                  produce((guardias) => {
-                    _.remove(guardias, (g) => g.id === guardia.id);
-                  })
-                )
-              }
-            />
-          ))}
+      <main className="App-main">
+        <Tabs>
+          <TabList>
+            <Tab>Horas</Tab>
+            <Tab>Guardias</Tab>
+            <Tab>Bonos</Tab>
+            <Tab>Sueldo</Tab>
+          </TabList>
 
-          <button onClick={onAgregarGuardiaClick}>Agregar Guardia</button>
-        </section>
-        <section>
-          <h1>Bonos</h1>
-          {_.map(bonos, (bono, i) => (
-            <Bono
-              key={i}
-              data={bono}
-              onChange={(key, value) => onBonoChange(bono.id, key, value)}
-              onDelete={() =>
-                setBonos(
-                  produce((bonos) => {
-                    _.remove(bonos, (b) => b.id === bono.id);
-                  })
-                )
-              }
-            />
-          ))}
-          <button onClick={onAgregarBonoClick}>Agregar Bono</button>
-        </section>
-        <section className="Sueldo">
-          <h1>Sueldo</h1>
-          <h1>$ {monthEarnings(moment().month(), guardias, horas, bonos)}</h1>
-        </section>
+          <TabPanel>
+            <h1>Horas</h1>
+            {_.map(horas, (hora, i) => (
+              <Hora
+                key={i}
+                data={hora}
+                onChange={(key, value) => onHoraChange(hora.id, key, value)}
+                onDelete={
+                  _.size(horas) > 1
+                    ? () => {
+                        setHoras(
+                          produce((horas) => {
+                            _.remove(horas, (h) => h.id === hora.id);
+                          })
+                        );
+                        setGuardias(
+                          produce((guardias) => {
+                            _.forEach(guardias, (guardia) => {
+                              if (guardia.fields.hour.value === hora.id) {
+                                guardia.fields.hour.value = horas[0].id;
+                              }
+                            });
+                          })
+                        );
+                      }
+                    : undefined
+                }
+              />
+            ))}
+            <button className="AgregarButton" onClick={onAgregarHoraClick}>
+              Agregar Hora
+            </button>
+          </TabPanel>
+          <TabPanel>
+            <h1>Guardias</h1>
+            {_.map(guardias, (guardia, i) => (
+              <Guardia
+                key={i}
+                data={guardia}
+                horas={horas}
+                onChange={(key, value) =>
+                  onGuardiaChange(guardia.id, key, value)
+                }
+                onDelete={() =>
+                  setGuardias(
+                    produce((guardias) => {
+                      _.remove(guardias, (g) => g.id === guardia.id);
+                    })
+                  )
+                }
+              />
+            ))}
+
+            <button className="AgregarButton" onClick={onAgregarGuardiaClick}>
+              Agregar Guardia
+            </button>
+          </TabPanel>
+          <TabPanel>
+            <h1>Bonos</h1>
+            {_.map(bonos, (bono, i) => (
+              <Bono
+                key={i}
+                data={bono}
+                onChange={(key, value) => onBonoChange(bono.id, key, value)}
+                onDelete={() =>
+                  setBonos(
+                    produce((bonos) => {
+                      _.remove(bonos, (b) => b.id === bono.id);
+                    })
+                  )
+                }
+              />
+            ))}
+            <button className="AgregarButton" onClick={onAgregarBonoClick}>
+              Agregar Bono
+            </button>
+          </TabPanel>
+          <TabPanel>
+            <h1>Sueldo</h1>
+            <h1>$ {monthEarnings(moment().month(), guardias, horas, bonos)}</h1>
+          </TabPanel>
+        </Tabs>
       </main>
     </div>
   );
